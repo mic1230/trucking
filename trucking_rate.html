@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trucking Rate Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        input[type="number"] {
+            padding: 5px;
+            width: 150px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Trucking Rate Calculator</h2>
+    <div class="input-group">
+        <label for="deadheadMiles">Deadhead Miles:</label><br>
+        <input type="number" id="deadheadMiles" placeholder="0" min="0">
+    </div>
+    <div class="input-group">
+        <label for="loadedMiles">Loaded Miles:</label><br>
+        <input type="number" id="loadedMiles" placeholder="0" min="0">
+    </div>
+    <div class="input-group">
+        <label for="toolMiles">Tool Miles:</label><br>
+        <input type="number" id="toolMiles" placeholder="0" min="0">
+    </div>
+    <button onclick="calculateRate()">Calculate</button>
+    <div id="result">Results will appear here</div>
+
+    <script>
+        // Fixed annual costs
+        const INSURANCE = 7000;              // $7,000/year
+        const IRP_PLATE = 1900;              // $1,900/year
+        const TRUCK_PAYMENT_MONTHLY = 850;   // $850/month
+        const HVUT = 550;                    // $550/year
+        const PERMITS_TOLLS = 1000;          // $1,000/year
+        const PERSONAL_EXPENSES_MONTHLY = 6600;  // $6,600/month
+
+        // Variable costs
+        const DIESEL_PRICE = 3.50;           // $3.50/gallon
+        const FUEL_EFFICIENCY = 6.3;         // 6.3 miles per gallon
+        const IFTA_TAX_RATE = 0.10;          // $0.10/gallon
+        const MAINTENANCE_PER_MILE = 0.17;   // $0.17/mile
+
+        // Profit margin
+        const PROFIT_MARGIN = 0.15;          // 15%
+
+        // Tool miles rate
+        const TOOL_MILES_RATE = 0.54;        // $0.54 per tool mile
+
+        // Annual working days
+        const WORKING_DAYS_PER_YEAR = 240;   // 240 days/year
+
+        function calculateRate() {
+            try {
+                // Get input values, default to 0 if empty or invalid
+                const deadheadMiles = parseFloat(document.getElementById("deadheadMiles").value) || 0;
+                const loadedMiles = parseFloat(document.getElementById("loadedMiles").value) || 0;
+                const toolMiles = parseFloat(document.getElementById("toolMiles").value) || 0;
+
+                const milesPerDay = deadheadMiles + loadedMiles;
+                const annualMiles = milesPerDay * WORKING_DAYS_PER_YEAR;
+
+                // Variable costs
+                const gallonsPerYear = annualMiles / FUEL_EFFICIENCY;
+                const fuelCostPerMile = (gallonsPerYear * DIESEL_PRICE) / annualMiles;
+                const iftaCostPerMile = (gallonsPerYear * IFTA_TAX_RATE) / annualMiles;
+                const maintenanceCostPerMile = MAINTENANCE_PER_MILE;
+
+                // Fixed costs per mile
+                const truckPaymentAnnual = TRUCK_PAYMENT_MONTHLY * 12;
+                const personalExpensesAnnual = PERSONAL_EXPENSES_MONTHLY * 12;
+
+                const insurancePerMile = INSURANCE / annualMiles;
+                const irpPlatePerMile = IRP_PLATE / annualMiles;
+                const truckPaymentPerMile = truckPaymentAnnual / annualMiles;
+                const hvutPerMile = HVUT / annualMiles;
+                const permitsTollsPerMile = PERMITS_TOLLS / annualMiles;
+                const personalExpensesPerMile = personalExpensesAnnual / annualMiles;
+
+                // Total operating cost per mile
+                const operatingCostPerMile = (
+                    fuelCostPerMile +
+                    iftaCostPerMile +
+                    maintenanceCostPerMile +
+                    insurancePerMile +
+                    irpPlatePerMile +
+                    truckPaymentPerMile +
+                    hvutPerMile +
+                    permitsTollsPerMile
+                );
+
+                // Total cost per mile including personal expenses
+                const totalCostPerMile = operatingCostPerMile + personalExpensesPerMile;
+
+                // Profit and final rate
+                const profitPerMile = totalCostPerMile * PROFIT_MARGIN;
+                const ratePerMile = totalCostPerMile + profitPerMile;
+
+                // Tool cost
+                const toolCost = toolMiles * TOOL_MILES_RATE;
+
+                // Format result
+                const result = `
+Annual Mileage: ${annualMiles.toLocaleString()} miles
+Operating Cost/Mile: $${operatingCostPerMile.toFixed(4)}
+Total Cost/Mile: $${totalCostPerMile.toFixed(4)}
+Profit/Mile (15%): $${profitPerMile.toFixed(4)}
+Tool Cost: $${toolCost.toFixed(2)}
+
+Charge: $${ratePerMile.toFixed(2)}/mile
+For ${milesPerDay.toFixed(0)}-mile load: $${(ratePerMile * milesPerDay).toFixed(2)} (With tools: $${(ratePerMile * milesPerDay + toolCost).toFixed(2)})
+                `;
+                document.getElementById("result").textContent = result;
+            } catch (error) {
+                document.getElementById("result").textContent = "Error: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
