@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trucking Rate Calculator</title>
+    <!-- Favicon for browsers -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <!-- Apple Touch Icon for iOS home screen -->
+    <link rel="apple-touch-icon" href="icon.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,57 +60,39 @@
     <div id="result">Results will appear here</div>
 
     <script>
-        // Fixed annual costs
-        const INSURANCE = 7000;              // $7,000/year
-        const IRP_PLATE = 1900;              // $1,900/year
-        const TRUCK_PAYMENT_MONTHLY = 850;   // $850/month
-        const HVUT = 550;                    // $550/year
-        const PERMITS_TOLLS = 1000;          // $1,000/year
-        const PERSONAL_EXPENSES_MONTHLY = 6600;  // $6,600/month
-
-        // Variable costs
-        const DIESEL_PRICE = 3.50;           // $3.50/gallon
-        const FUEL_EFFICIENCY = 6.3;         // 6.3 miles per gallon
-        const IFTA_TAX_RATE = 0.10;          // $0.10/gallon
-        const MAINTENANCE_PER_MILE = 0.17;   // $0.17/mile
-
-        // Profit margin
-        const PROFIT_MARGIN = 0.15;          // 15%
-
-        // Tool miles rate
-        const TOOL_MILES_RATE = 0.54;        // $0.54 per tool mile
-
-        // Annual working days
-        const WORKING_DAYS_PER_YEAR = 240;   // 240 days/year
+        const INSURANCE = 7000;
+        const IRP_PLATE = 1900;
+        const TRUCK_PAYMENT_MONTHLY = 850;
+        const HVUT = 550;
+        const PERMITS_TOLLS = 1000;
+        const PERSONAL_EXPENSES_MONTHLY = 6600;
+        const DIESEL_PRICE = 3.50;
+        const FUEL_EFFICIENCY = 6.3;
+        const IFTA_TAX_RATE = 0.10;
+        const MAINTENANCE_PER_MILE = 0.17;
+        const PROFIT_MARGIN = 0.15;
+        const TOOL_MILES_RATE = 0.54;
+        const WORKING_DAYS_PER_YEAR = 240;
 
         function calculateRate() {
             try {
-                // Get input values, default to 0 if empty or invalid
                 const deadheadMiles = parseFloat(document.getElementById("deadheadMiles").value) || 0;
                 const loadedMiles = parseFloat(document.getElementById("loadedMiles").value) || 0;
                 const toolMiles = parseFloat(document.getElementById("toolMiles").value) || 0;
-
                 const milesPerDay = deadheadMiles + loadedMiles;
                 const annualMiles = milesPerDay * WORKING_DAYS_PER_YEAR;
-
-                // Variable costs
                 const gallonsPerYear = annualMiles / FUEL_EFFICIENCY;
                 const fuelCostPerMile = (gallonsPerYear * DIESEL_PRICE) / annualMiles;
                 const iftaCostPerMile = (gallonsPerYear * IFTA_TAX_RATE) / annualMiles;
                 const maintenanceCostPerMile = MAINTENANCE_PER_MILE;
-
-                // Fixed costs per mile
                 const truckPaymentAnnual = TRUCK_PAYMENT_MONTHLY * 12;
                 const personalExpensesAnnual = PERSONAL_EXPENSES_MONTHLY * 12;
-
                 const insurancePerMile = INSURANCE / annualMiles;
                 const irpPlatePerMile = IRP_PLATE / annualMiles;
                 const truckPaymentPerMile = truckPaymentAnnual / annualMiles;
                 const hvutPerMile = HVUT / annualMiles;
                 const permitsTollsPerMile = PERMITS_TOLLS / annualMiles;
                 const personalExpensesPerMile = personalExpensesAnnual / annualMiles;
-
-                // Total operating cost per mile
                 const operatingCostPerMile = (
                     fuelCostPerMile +
                     iftaCostPerMile +
@@ -117,18 +103,10 @@
                     hvutPerMile +
                     permitsTollsPerMile
                 );
-
-                // Total cost per mile including personal expenses
                 const totalCostPerMile = operatingCostPerMile + personalExpensesPerMile;
-
-                // Profit and final rate
                 const profitPerMile = totalCostPerMile * PROFIT_MARGIN;
                 const ratePerMile = totalCostPerMile + profitPerMile;
-
-                // Tool cost
                 const toolCost = toolMiles * TOOL_MILES_RATE;
-
-                // Format result
                 const result = `
 Annual Mileage: ${annualMiles.toLocaleString()} miles
 Operating Cost/Mile: $${operatingCostPerMile.toFixed(4)}
